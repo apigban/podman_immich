@@ -1,0 +1,15 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "Clear molecule instance config for pre-existing host"
+      ansible.builtin.set_fact:
+        instance_conf_list: [] # Set to an empty list
+
+    - name: "Dump empty instance config to {{ molecule_instance_config }}"
+      ansible.builtin.copy:
+        content: "{{ instance_conf_list | to_yaml }}"
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"

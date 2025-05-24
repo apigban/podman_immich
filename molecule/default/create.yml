@@ -1,0 +1,27 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "Prepare molecule instance config for pre-existing host"
+      ansible.builtin.set_fact:
+        instance_conf_list: |
+          {% set instances = [] %}
+          {% for item in molecule_yml.platforms %}
+          {% set _ = instances.append({
+                'instance': item.name,
+                'address': item.ansible_host | default(item.name),
+                'user': item.ansible_user | default(lookup('env', 'USER')),
+                'port': item.ansible_port | default(omit),
+                'identity_file': item.ansible_ssh_private_key_file | default(omit),
+                'python_interpreter': item.ansible_python_interpreter | default(omit)
+              }) %}
+          {% endfor %}
+          {{ instances }}
+      
+    - name: "Dump instance config to {{ molecule_instance_config }}"
+      ansible.builtin.copy:
+        content: "{{ instance_conf_list | to_yaml }}"
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"

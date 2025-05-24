@@ -1,0 +1,30 @@
+---
+- name: "Create Immich Podman network"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_network:
+    name: "{{ immich_network_name }}"
+    state: present
+
+- name: "Create Podman volume for PostgreSQL data"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_volume:
+    name: "pgdata"
+    state: present
+  
+- name: "Create Podman volume for Redis data"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_volume:
+    name: "redisdata"
+    state: present
+
+- name: "Create Podman volume for Immich generated files"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_volume:
+    name: "immich-generated"
+    state: present
+
+- name: "Create Podman volume for JSON log files (bind mount to host path)"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_volume:
+    name: "immich-logs"
+    state: present

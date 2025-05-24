@@ -1,0 +1,79 @@
+- name: "Deploy PostgreSQL container"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_container:
+    name: "{{ immich_db_hostname }}"
+    image: "{{ postgres_image_name }}:{{ postgres_image_tag }}"
+    hostname: "{{ immich_db_hostname }}"
+    env:
+      POSTGRES_USER: "{{ immich_db_username }}"
+      POSTGRES_PASSWORD: "{{ immich_db_password }}"
+      POSTGRES_DB: "{{ immich_db_name }}"
+      PG_DATA: "/var/lib/postgresql/data" # Internal path, ensure volume maps here
+    volume:
+      - "pgdata:/var/lib/postgresql:Z" # :Z for SELinux
+    network:
+      - "{{ immich_network_name }}"
+    restart_policy: "always"
+    state: started
+    healthcheck:
+      cmd: "pg_isready -U {{ immich_db_username }} -d {{ immich_db_name }}"
+      interval: "5s"
+      retries: 10
+      timeout: "10s"
+    log_driver: "json-file"
+    log_options:
+      max_size: "100m"
+      path: "{{ immich_json_logs_location }}/postgresql-{{ immich_db_hostname }}.log"
+
+- name: "Deploy Redis container"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_container:
+    name: "{{ immich_redis_hostname }}"
+    image: "{{ redis_image_name }}:{{ redis_image_tag }}"
+    hostname: "{{ immich_redis_hostname }}"
+    env:
+      REDIS_PASSWORD: "{{ immich_redis_password }}"
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning", "--requirepass", "{{ immich_redis_password }}"] # Explicitly run redis
+    volume:
+      - "redisdata:/data:Z"
+    network:
+      - "{{ immich_network_name }}"
+    restart_policy: "always"
+    state: started
+    healthcheck:
+      cmd: "redis-cli -a {{ immich_redis_password }} ping"
+      interval: "5s"
+      retries: 10
+      timeout: "5s"
+    log_driver: "json-file"
+    log_options:
+      max_size: "10m"
+      path: "{{ immich_json_logs_location }}/redis-{{ immich_redis_hostname }}.log"
+
+- name: "Deploy Immich Machine Learning container"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_container:
+    name: "immich-machine-learning"
+    image: "{{ immich_machine_learning_image_name }}:{{ immich_version }}"
+    hostname: "immich-machine-learning"
+    user: "{{ immich_container_uid }}:{{ immich_container_gid }}"
+    env:
+      DB_HOSTNAME: "{{ immich_db_hostname }}"
+      DB_USERNAME: "{{ immich_db_username }}"
+      DB_PASSWORD: "{{ immich_db_password }}"
+      DB_DATABASE_NAME: "{{ immich_db_name }}"
+      REDIS_HOSTNAME: "{{ immich_redis_hostname }}"
+      REDIS_PASSWORD: "{{ immich_redis_password }}"
+      LOG_LEVEL: "{{ immich_log_level }}"
+      TZ: "{{ immich_timezone }}"
+    volume:
+      - "{{ immich_generated_data_location }}:/usr/src/app/upload:Z" # Path for models cache - ​​https://immich.app/docs/FAQ/#the-immich_model-cache-volume-takes-up-a-lot-of-space-what-could-be-the-problem
+    network:
+      - "{{ immich_network_name }}"
+    restart_policy: "always"
+    stop_timeout: 60
+    state: started
+    log_driver: "json-file"
+    log_options:
+      max_size: "10m"
+      path: "{{ immich_json_logs_location }}/immich-machine-learning.log"

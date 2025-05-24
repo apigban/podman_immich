@@ -1,0 +1,16 @@
+galaxy_info:
+  role_name: apigban.immich_podman
+  author: Alain Pinero Igban
+  description: Deploys immich using podman
+  company: apigban.com
+
+  license: MIT
+
+  min_ansible_version: 2.17.5
+
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+
+  galaxy_tags: []

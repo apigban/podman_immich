@@ -1,0 +1,48 @@
+---
+container_volume_root: "/home/{{ ansible_user }}/.local/share/containers/storage/volumes"
+
+immich_version: "v1.133.1" # replace with specific release version
+immich_data_root: "/opt/immich" # Base path for all Immich data on the host
+immich_upload_location: "{{ immich_data_root }}/upload"
+immich_db_data_location: "{{ immich_data_root }}/postgres"
+immich_redis_data_location: "{{ immich_data_root }}/redis"
+immich_generated_data_location: "{{ immich_data_root }}/generated" # For thumbnails, etc.
+immich_json_logs_location: "{{ container_volume_root}}/immich-logs/_data"
+
+# User and Group ID for container processes
+immich_container_uid: "1000"
+immich_container_gid: "1000"
+
+# Network and Port settings
+immich_network_name: "immich_network"
+immich_proxy_port: "2283" # External port for immich-proxy
+
+# Database Credentials
+immich_db_username: "immich"
+immich_db_password: "your_secure_postgres_password"
+immich_db_name: "immich"
+
+# Redis Password
+immich_redis_password: "your_secure_redis_password"
+
+# URLs and Names for service communication within podman network
+immich_db_hostname: "immich-database"
+immich_redis_hostname: "immich-redis"
+immich_server_url: "http://immich-server:3001"
+immich_machine_learning_url: "http://immich-machine-learning:3003"
+#
+# # Other configurations
+immich_log_level: "log" # Values: verbose, debug, log, warn, error
+immich_timezone: "Asia/Dubai"
+enable_proxy_container: false
+
+# Image details
+postgres_image_name: "ghcr.io/immich-app/postgres"
+postgres_image_tag: "14-vectorchord0.3.0-pgvectors0.2.0"
+redis_image_name: "docker.io/valkey/valkey"
+redis_image_tag: "8-bookworm@sha256:ff21bc0f8194dc9c105b769aeabf9585fea6a8ed649c0781caeac5cb3c247884"
+immich_server_image_name: "ghcr.io/immich-app/immich-server"
+immich_microservices_image_name: "ghcr.io/immich-app/immich-microservices"
+immich_machine_learning_image_name: "ghcr.io/immich-app/immich-machine-learning"
+immich_web_image_name: "ghcr.io/immich-app/immich-web"
+immich_proxy_image_name: "ghcr.io/immich-app/immich-proxy"
