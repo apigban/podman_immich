@@ -1,0 +1,14 @@
+# ---> Ansible
+*.retry
+
+vars/secrets.yml
+tasks/ansible-navigator.log
+files/home.priv
+ansible-navigator.log
+tests/
+home.priv
+home.pub
+molecule/default/.env.yml
+.env.yml
+
+immich-base/
