@@ -1,6 +1,6 @@
 ---
 - name: "Create required directories"
-  ansible.builtin.include_tasks: 01-create-directories.yml
+  ansible.builtin.include_tasks: 01-create-mountpoints.yml
 
 - name: "Create network and container volumes"
   ansible.builtin.include_tasks: 02-create-podman-network-and-volumes.yml

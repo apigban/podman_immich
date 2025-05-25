@@ -13,3 +13,14 @@
     - "{{ immich_redis_data_location }}"
     - "{{ immich_generated_data_location }}"
     - "{{ immich_json_logs_location }}"
+    - "{{ external_lib_dst }}"
+
+- name: Mount External Library as Read-Only
+  become: true 
+  ansible.posix.mount:
+    src: "{{ external_lib_src }}:{{ external_lib_src_export_path }}"
+    path: "{{ external_lib_dst }}"
+    fstype: "nfs"
+    opts: "ro,sync,hard,intr" 
+    state: "mounted"
+  when: external_lib_enabled

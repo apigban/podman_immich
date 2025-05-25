@@ -17,6 +17,21 @@ immich_container_gid: "1000"
 immich_network_name: "immich_network"
 immich_proxy_port: "2283" # External port for immich-proxy
 
+# NFS External Library Configuration
+# ----------------------------------
+# This section allows for the configuration of an NFS-mounted external library for Immich.
+# By default, this feature is disabled (`external_lib_enabled: false`).
+# To enable it, set `external_lib_enabled` to `true` in your `vars/main.yml` or inventory.
+# You will also need to provide the following values:
+#   - `external_lib_src`: The NFS source, e.g., "nfs-server.example.com:/exports/photos".
+#   - `external_lib_src_export_path`: The base export path on the NFS server, e.g., "/exports/photos". This is used for SELinux context if applicable.
+#   - `external_lib_dst`: The destination mount point on the host where the NFS share will be mounted, e.g., "/mnt/immich_external_lib". This path will then be volume-mounted into the Immich container.
+# NFS External Library configuration, false by default.
+external_lib_enabled: false
+external_lib_src: ""
+external_lib_src_export_path: ""
+external_lib_dst: ""
+
 # Database Credentials
 immich_db_username: "immich"
 immich_db_password: "your_secure_postgres_password"
