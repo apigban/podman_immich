@@ -3,7 +3,6 @@ container_volume_root: "/home/{{ ansible_user }}/.local/share/containers/storage
 
 immich_version: "v1.133.1" # replace with specific release version
 immich_data_root: "/opt/immich" # Base path for all Immich data on the host
-immich_upload_location: "{{ immich_data_root }}/upload"
 immich_db_data_location: "{{ immich_data_root }}/postgres"
 immich_redis_data_location: "{{ immich_data_root }}/redis"
 immich_generated_data_location: "{{ immich_data_root }}/generated" # For thumbnails, etc.
@@ -17,15 +16,31 @@ immich_container_gid: "1000"
 immich_network_name: "immich_network"
 immich_proxy_port: "2283" # External port for immich-proxy
 
+# NFS Immich Upload Configuration
+# ----------------------------------
+# This section allows for the configuration of an NFS-mounted upload path for Immich.
+# By default, this feature is disabled (`external_immich_upload_enabled: false`).
+# To enable it, set `external_immich_upload_enabled` to `true` in your `vars/main.yml` or inventory.
+# You will also need to provide the following values:
+#   - `external_immich_upload_src`: The NFS source, e.g., "nfs-server.example.com".
+#   - `external_immich_upload_export_path`: The base export path on the NFS server, e.g., "/exports/photos".
+#   - `external_immich_upload_dst`: The destination mount point on the host where the NFS share will be mounted, e.g., "/mnt/immich_external_lib". This path will then be volume-mounted into the immich_server container.
+# NFS External Library configuration, false by default.
+external_immich_upload_enabled: false
+external_immich_upload_src: ""
+external_immich_upload_export_path: ""
+external_immich_upload_dst: ""
+
+
 # NFS External Library Configuration
 # ----------------------------------
 # This section allows for the configuration of an NFS-mounted external library for Immich.
 # By default, this feature is disabled (`external_lib_enabled: false`).
 # To enable it, set `external_lib_enabled` to `true` in your `vars/main.yml` or inventory.
 # You will also need to provide the following values:
-#   - `external_lib_src`: The NFS source, e.g., "nfs-server.example.com:/exports/photos".
-#   - `external_lib_src_export_path`: The base export path on the NFS server, e.g., "/exports/photos". This is used for SELinux context if applicable.
-#   - `external_lib_dst`: The destination mount point on the host where the NFS share will be mounted, e.g., "/mnt/immich_external_lib". This path will then be volume-mounted into the Immich container.
+#   - `external_lib_src`: The NFS source, e.g., "nfs-server.example.com".
+#   - `external_lib_src_export_path`: The base export path on the NFS server, e.g., "/exports/photos".
+#   - `external_lib_dst`: The destination mount point on the host where the NFS share will be mounted, e.g., "/mnt/immich_external_lib". This path will then be volume-mounted into the immich_server container.
 # NFS External Library configuration, false by default.
 external_lib_enabled: false
 external_lib_src: ""

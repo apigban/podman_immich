@@ -23,6 +23,13 @@
     name: "immich-generated"
     state: present
 
+- name: "Create Podman volume for immich-upload data"
+  become_user: "{{ ansible_user }}"
+  containers.podman.podman_volume:
+    name: "immich-upload"
+    state: present
+  when: not external_immich_upload_enabled | bool
+
 - name: "Create Podman volume for JSON log files (bind mount to host path)"
   become_user: "{{ ansible_user }}"
   containers.podman.podman_volume:

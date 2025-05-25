@@ -1,6 +1,12 @@
 ---
+# NFS Immich Upload configuration
+external_immich_upload_enabled: true
+external_immich_upload_src: "storage01.home.apigban.com"
+external_immich_upload_export_path: "/media/pool01/immich-upload"
+external_immich_upload_dst: "/mnt/immich-upload"
+
 # NFS External Library configuration
-# external_lib_enabled: true
-# external_lib_src: "storage01"
-# external_lib_src_export_path: "/media/pool01/immich-external-libraries"
-# external_lib_dst: "/mnt/immich-external-library"
+external_lib_enabled: true
+external_lib_src: "storage01.home.apigban.com"
+external_lib_src_export_path: "/media/pool01/immich-external-libraries"
+external_lib_dst: "/mnt/immich-external-library"

@@ -77,3 +77,39 @@
     log_options:
       max_size: "10m"
       path: "{{ immich_json_logs_location }}/immich-machine-learning.log"
+
+- name: "Deploy Immich Server container"
+  containers.podman.podman_container:
+    name: "immich-server"
+    image: "{{ immich_server_image_name }}:{{ immich_version }}"
+    hostname: "immich-server"
+    user: "{{ immich_container_uid }}:{{ immich_container_gid }}"
+    env:
+      DB_HOSTNAME: "{{ immich_db_hostname }}"
+      DB_USERNAME: "{{ immich_db_username }}"
+      DB_PASSWORD: "{{ immich_db_password }}"
+      DB_DATABASE_NAME: "{{ immich_db_name }}"
+      REDIS_HOSTNAME: "{{ immich_redis_hostname }}"
+      REDIS_PASSWORD: "{{ immich_redis_password }}"
+      LOG_LEVEL: "{{ immich_log_level }}"
+      MACHINE_LEARNING_URL: "{{ immich_machine_learning_url }}"
+      TZ: "{{ immich_timezone }}"
+    volume: >-
+      {{
+        [
+          (external_immich_upload_dst ~ ':/usr/src/app/upload:Z' if external_immich_upload_enabled | bool else 'immich-upload:/usr/src/app/upload:Z'),
+          'immich-generated:/usr/src/app/generated:Z'
+        ]
+        +
+        ([external_lib_dst ~ ':/usr/src/app/external:ro'] if external_lib_enabled | bool and external_lib_dst else [])
+      }}
+    command: ""
+    network:
+      - "{{ immich_network_name }}"
+    restart_policy: "always"
+    stop_timeout: 60
+    state: started
+    log_driver: "json-file"
+    log_options:
+      max_size: "100m"
+      path: "{{ immich_json_logs_location }}/immich-server.log"
