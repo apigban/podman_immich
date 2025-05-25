@@ -104,6 +104,8 @@
         ([external_lib_dst ~ ':/usr/src/app/external:ro'] if external_lib_enabled | bool and external_lib_dst else [])
       }}
     command: ""
+    ports: # TODO: Create parametrized conditions for the scenarios: expose a variable host:container port, create a web proxy
+      - "2283:2283"
     network:
       - "{{ immich_network_name }}"
     restart_policy: "always"
@@ -113,3 +115,12 @@
     log_options:
       max_size: "100m"
       path: "{{ immich_json_logs_location }}/immich-server.log"
+
+- name: "Allow Immich Server port through firewall"
+  become: true
+  ansible.posix.firewalld:
+    port: "2283/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  when: ansible_facts['os_family'] == "RedHat"
