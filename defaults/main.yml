@@ -1,12 +1,8 @@
 ---
 container_volume_root: "/home/{{ ansible_user }}/.local/share/containers/storage/volumes"
+immich_json_logs_location: "{{ container_volume_root}}/immich-logs/_data"
 
 immich_version: "v1.133.1" # replace with specific release version
-immich_data_root: "/opt/immich" # Base path for all Immich data on the host
-immich_db_data_location: "{{ immich_data_root }}/postgres"
-immich_redis_data_location: "{{ immich_data_root }}/redis"
-immich_generated_data_location: "{{ immich_data_root }}/generated" # For thumbnails, etc.
-immich_json_logs_location: "{{ container_volume_root}}/immich-logs/_data"
 
 # User and Group ID for container processes
 immich_container_uid: "1000"

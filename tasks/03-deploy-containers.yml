@@ -66,8 +66,9 @@
       REDIS_PASSWORD: "{{ immich_redis_password }}"
       LOG_LEVEL: "{{ immich_log_level }}"
       TZ: "{{ immich_timezone }}"
+      MACHINE_LEARNING_CACHE_DIR: "/cache" # Default is /cache, explicitly set for clarity
     volume:
-      - "{{ immich_generated_data_location }}:/usr/src/app/upload:Z" # Path for models cache - ​​https://immich.app/docs/FAQ/#the-immich_model-cache-volume-takes-up-a-lot-of-space-what-could-be-the-problem
+      - "immich-model-cache:/cache:Z" # Volume for downloaded machine learning models
     network:
       - "{{ immich_network_name }}"
     restart_policy: "always"
@@ -105,7 +106,7 @@
       }}
     command: ""
     ports: # TODO: Create parametrized conditions for the scenarios: expose a variable host:container port, create a web proxy
-      - "2283:2283"
+      - "{{ immich_proxy_port }}:2283"
     network:
       - "{{ immich_network_name }}"
     restart_policy: "always"
@@ -119,7 +120,7 @@
 - name: "Allow Immich Server port through firewall"
   become: true
   ansible.posix.firewalld:
-    port: "2283/tcp"
+    port: "{{ immich_proxy_port }}/tcp"
     permanent: true
     state: enabled
   when: ansible_facts['os_family'] == "RedHat"

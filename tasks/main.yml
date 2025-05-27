@@ -1,6 +1,12 @@
 ---
+- name: "Install required packages"
+  ansible.builtin.include_tasks: 00-install-required-packages.yml
+
 - name: "Create required directories"
-  ansible.builtin.include_tasks: 01-create-mountpoints.yml
+  ansible.builtin.include_tasks: 01-prepare-host-directories.yml
+
+- name: "Configure NFS Mounts"
+  ansible.builtin.include_tasks: 02-configure-nfs-mounts.yml
 
 - name: "Create network and container volumes"
   ansible.builtin.include_tasks: 02-create-podman-network-and-volumes.yml

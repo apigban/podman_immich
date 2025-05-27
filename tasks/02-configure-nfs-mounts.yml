@@ -1,0 +1,20 @@
+---
+- name: "Mount IMMICH UPLOAD via NFS (if external upload enabled)"
+  become: true
+  ansible.posix.mount:
+    src: "{{ external_immich_upload_src }}:{{ external_immich_upload_export_path }}"
+    path: "{{ external_immich_upload_dst }}"
+    fstype: "nfs"
+    opts: "rw,sync,hard,intr"
+    state: "mounted"
+  when: external_immich_upload_enabled | bool
+
+- name: "Mount EXTERNAL LIBRARY via NFS (if external library enabled)"
+  become: true
+  ansible.posix.mount:
+    src: "{{ external_lib_src }}:{{ external_lib_src_export_path }}"
+    path: "{{ external_lib_dst }}"
+    fstype: "nfs"
+    opts: "rw,sync,hard,intr"
+    state: "mounted"
+  when: external_lib_enabled | bool

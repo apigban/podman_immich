@@ -1,0 +1,8 @@
+---
+- name: Install pre-requisite packages
+  become: true
+  ansible.builtin.package:
+    name: 
+      - nfs-utils
+    state: latest
+  when: external_immich_upload_enabled | bool

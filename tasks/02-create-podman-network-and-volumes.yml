@@ -5,33 +5,22 @@
     name: "{{ immich_network_name }}"
     state: present
 
-- name: "Create Podman volume for PostgreSQL data"
-  become_user: "{{ ansible_user }}"
-  containers.podman.podman_volume:
-    name: "pgdata"
-    state: present
-  
-- name: "Create Podman volume for Redis data"
-  become_user: "{{ ansible_user }}"
-  containers.podman.podman_volume:
-    name: "redisdata"
-    state: present
+- name: "Define Podman volumes to be created"
+  ansible.builtin.set_fact:
+    podman_volumes_to_create:
+      - { name: "pgdata" }
+      - { name: "redisdata" }
+      - { name: "immich-generated" }
+      - { name: "immich-model-cache" } # For ML model caching
+      - { name: "immich-logs" } # For JSON log files (bind mount defined in defaults)
+      - { name: "immich-upload", condition: "not (external_immich_upload_enabled | bool)" }
 
-- name: "Create Podman volume for Immich generated files"
+- name: "Create Podman volumes"
   become_user: "{{ ansible_user }}"
   containers.podman.podman_volume:
-    name: "immich-generated"
+    name: "{{ item.name }}"
     state: present
-
-- name: "Create Podman volume for immich-upload data"
-  become_user: "{{ ansible_user }}"
-  containers.podman.podman_volume:
-    name: "immich-upload"
-    state: present
-  when: not external_immich_upload_enabled | bool
-
-- name: "Create Podman volume for JSON log files (bind mount to host path)"
-  become_user: "{{ ansible_user }}"
-  containers.podman.podman_volume:
-    name: "immich-logs"
-    state: present
+  loop: "{{ podman_volumes_to_create }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.condition | default(true)

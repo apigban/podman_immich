@@ -1,0 +1,41 @@
+---
+- name: "Ensure Immich JSON logs directory exists"
+  become: true
+  ansible.builtin.file:
+    path: "{{ immich_json_logs_location }}"
+    state: directory
+    owner: "{{ immich_container_uid }}"
+    group: "{{ immich_container_gid }}"
+    mode: '0755'
+
+# This task creates the directory for 'external_immich_upload_dst' only if:
+# 1. External uploads are enabled ('external_immich_upload_enabled' is true).
+# 2. The destination path ('external_immich_upload_dst') is not already an active mount point.
+# This prevents errors if attempting to manage a directory that's part of an active (possibly read-only) mount.
+- name: "Ensure local directory for IMMICH UPLOAD mount point exists"
+  become: true
+  ansible.builtin.file:
+    path: "{{ external_immich_upload_dst }}"
+    state: directory
+    owner: "{{ immich_container_uid }}"
+    group: "{{ immich_container_gid }}"
+    mode: '0755'
+  when:
+    - external_immich_upload_enabled | bool
+    - external_immich_upload_dst not in (ansible_mounts | map(attribute='mount') | list)
+
+# This task creates the directory for 'external_lib_dst' only if:
+# 1. External library is enabled ('external_lib_enabled' is true).
+# 2. The destination path ('external_lib_dst') is not already an active mount point.
+# This prevents errors if attempting to manage a directory that's part of an active (possibly read-only) mount.
+- name: "Ensure local directory for EXTERNAL LIBRARY mount point exists"
+  become: true
+  ansible.builtin.file:
+    path: "{{ external_lib_dst }}"
+    state: directory
+    owner: "{{ immich_container_uid }}"
+    group: "{{ immich_container_gid }}"
+    mode: '0755'
+  when:
+    - external_lib_enabled | bool
+    - external_lib_dst not in (ansible_mounts | map(attribute='mount') | list)
