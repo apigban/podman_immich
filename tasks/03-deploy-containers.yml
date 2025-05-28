@@ -8,7 +8,7 @@
       POSTGRES_USER: "{{ immich_db_username }}"
       POSTGRES_PASSWORD: "{{ immich_db_password }}"
       POSTGRES_DB: "{{ immich_db_name }}"
-      PG_DATA: "/var/lib/postgresql/data" # Internal path, ensure volume maps here
+      PGDATA: "/var/lib/postgresql/data" # Internal path, ensure volume maps here
     volume:
       - "pgdata:/var/lib/postgresql:Z" # :Z for SELinux
     network:
@@ -80,6 +80,7 @@
       path: "{{ immich_json_logs_location }}/immich-machine-learning.log"
 
 - name: "Deploy Immich Server container"
+  become_user: "{{ ansible_user }}"
   containers.podman.podman_container:
     name: "immich-server"
     image: "{{ immich_server_image_name }}:{{ immich_version }}"
@@ -104,7 +105,6 @@
         +
         ([external_lib_dst ~ ':/usr/src/app/external:ro'] if external_lib_enabled | bool and external_lib_dst else [])
       }}
-    command: ""
     ports: # TODO: Create parametrized conditions for the scenarios: expose a variable host:container port, create a web proxy
       - "{{ immich_proxy_port }}:2283"
     network:
