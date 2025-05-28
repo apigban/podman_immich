@@ -12,7 +12,6 @@
       - { name: "redisdata" }
       - { name: "immich-generated" }
       - { name: "immich-model-cache" } # For ML model caching
-      - { name: "immich-logs" } # For JSON log files (bind mount defined in defaults)
       - { name: "immich-upload", condition: "not (external_immich_upload_enabled | bool)" }
 
 - name: "Create Podman volumes"
