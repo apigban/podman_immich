@@ -1,8 +1,42 @@
 ---
-- name: Install pre-requisite packages
+- name: "Ensure Podman is installed"
   become: true
   ansible.builtin.package:
-    name: 
-      - nfs-utils
-    state: latest
+    name: "podman"
+    state: present
+
+# NFS Client Installation (Conditional)
+- name: "Set NFS client package name based on OS family"
+  ansible.builtin.set_fact:
+    _nfs_client_package_name: "{{ 'nfs-utils' if ansible_facts['os_family'] == 'RedHat' else 'nfs-common' if ansible_facts['os_family'] == 'Debian' else '' }}"
   when: (external_immich_upload_enabled | bool) or (external_lib_enabled | bool)
+
+- name: "Install NFS client utilities (if NFS enabled and package name determined)"
+  become: true
+  ansible.builtin.package:
+    name: "{{ _nfs_client_package_name }}"
+    state: present
+  when:
+    - (external_immich_upload_enabled | bool) or (external_lib_enabled | bool)
+    - _nfs_client_package_name is defined and _nfs_client_package_name != ""
+
+# Firewall package and setup for Debian
+- name: "Install ufw on Debian family systems"
+  become: true
+  ansible.builtin.package:
+    name: "ufw"
+    state: present
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: "Allow SSH through ufw on Debian family systems"
+  become: true
+  community.general.ufw:
+    rule: allow
+    name: "OpenSSH" # Assumes OpenSSH app profile exists in /etc/ufw/applications.d/
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: "Enable ufw on Debian family systems"
+  become: true
+  community.general.ufw:
+    state: enabled
+  when: ansible_facts['os_family'] == "Debian"
