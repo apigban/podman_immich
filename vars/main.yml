@@ -2,7 +2,7 @@
 # NFS Immich Upload configuration
 external_immich_upload_enabled: true
 external_immich_upload_src: "storage01.home.apigban.com"
-external_immich_upload_export_path: "/media/pool01/immich-upload"
+external_immich_upload_export_path: "/media/pool01/immich-upload-debian"
 external_immich_upload_dst: "/mnt/immich-upload"
 
 # NFS External Library configuration

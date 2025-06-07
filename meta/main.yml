@@ -12,5 +12,8 @@ galaxy_info:
     - name: EL
       versions:
         - "9"
+    - name: Debian
+      versions:
+        - "12" # Bookworm
 
   galaxy_tags: []
