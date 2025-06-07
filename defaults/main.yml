@@ -2,7 +2,7 @@
 container_volume_root: "/home/{{ ansible_user }}/.local/share/containers/storage/volumes"
 immich_json_logs_location: "{{ container_volume_root}}/immich-logs/_data"
 
-immich_version: "v1.133.4" # replace with specific release version
+immich_version: "v1.134.0" # replace with specific release version
 
 # User and Group ID for container processes
 immich_container_uid: "1000"
