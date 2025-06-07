@@ -5,6 +5,44 @@
     name: "{{ immich_network_name }}"
     state: present
 
+- name: "Get Immich Podman network details"
+  become_user: "{{ ansible_user }}" # Run as ansible_user to query their podman networks
+  containers.podman.podman_network_info:
+    name: "{{ immich_network_name }}"
+  register: immich_network_details_raw
+
+- name: "Allow traffic within Immich Podman network in UFW"
+  become: true # UFW commands require root privileges
+  community.general.ufw:
+    rule: allow
+    src: "{{ immich_network_details_raw.networks[0].subnets[0].subnet }}"
+    dest: "{{ immich_network_details_raw.networks[0].subnets[0].subnet }}"
+    comment: "Allow all traffic within Immich Podman network {{ immich_network_name }} ({{ immich_network_details_raw.networks[0].subnets[0].subnet }})"
+  when:
+    - ansible_facts['os_family'] == "Debian" # Only run on Debian-based systems
+    - immich_network_details_raw.networks is defined
+    - immich_network_details_raw.networks | length > 0
+    - immich_network_details_raw.networks[0].subnets is defined
+    - immich_network_details_raw.networks[0].subnets | length > 0
+    - immich_network_details_raw.networks[0].subnets[0].subnet is defined
+
+- name: "Allow FORWARDED external traffic to Immich container port (2283/tcp) on Podman network"
+  become: true # UFW commands require root privileges
+  community.general.ufw:
+    rule: allow
+    route: yes # Add to FORWARD chain (ufw-user-forward)
+    proto: tcp
+    to_ip: "{{ immich_network_details_raw.networks[0].subnets[0].subnet }}"
+    to_port: '2283' # The Immich container's listening port for web UI
+    comment: "Allow FORWARDED external to TCP/2283 on {{ immich_network_name }} ({{ immich_network_details_raw.networks[0].subnets[0].subnet }})"
+  when:
+    - ansible_facts['os_family'] == "Debian" # Only run on Debian-based systems
+    - immich_network_details_raw.networks is defined
+    - immich_network_details_raw.networks | length > 0
+    - immich_network_details_raw.networks[0].subnets is defined
+    - immich_network_details_raw.networks[0].subnets | length > 0
+    - immich_network_details_raw.networks[0].subnets[0].subnet is defined
+
 - name: "Define Podman volumes to be created"
   ansible.builtin.set_fact:
     podman_volumes_to_create:
