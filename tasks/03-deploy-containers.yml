@@ -9,6 +9,7 @@
       POSTGRES_PASSWORD: "{{ immich_db_password }}"
       POSTGRES_DB: "{{ immich_db_name }}"
       PGDATA: "/var/lib/postgresql/data" # Internal path, ensure volume maps here
+      POSTGRES_INITDB_ARGS: '--data-checksums'
     volume:
       - "pgdata:/var/lib/postgresql:Z" # :Z for SELinux
     network:
