@@ -5,3 +5,10 @@
     name: firewalld.service # Using .service suffix is more explicit for systemd
     state: restarted
   when: ansible_facts['os_family'] == "RedHat"
+
+- name: Reload ufw
+  become: true
+  ansible.builtin.command: ufw reload
+  when: ansible_facts['os_family'] == "Debian"
+  # Consider checking if ufw service is active before reloading if more robustness is needed.
+  # For example, using `ansible.builtin.systemd: name: ufw state: reloaded`

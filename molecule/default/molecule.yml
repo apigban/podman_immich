@@ -2,8 +2,12 @@
 driver:
   name: default
 platforms:
-  - name: almalinux-9.4
-    ansible_host: 192.168.2.41
-    ansible_user: ansible
+  # - name: almalinux-9.4
+  #   ansible_host: 192.168.2.41
+  #   ansible_user: ansible
+  #   ansible_ssh_private_key_file: ../../immich-base/home.priv
+  - name: debian-12
+    ansible_host: 192.168.2.43
+    ansible_user: root
+    ansible_ssh_user: root
     ansible_ssh_private_key_file: ../../immich-base/home.priv
-    # ansible_python_interpreter: /usr/bin/python3

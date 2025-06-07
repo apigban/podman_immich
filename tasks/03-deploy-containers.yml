@@ -15,11 +15,6 @@
       - "{{ immich_network_name }}"
     restart_policy: "always"
     state: started
-    healthcheck:
-      cmd: "pg_isready -U {{ immich_db_username }} -d {{ immich_db_name }}"
-      interval: "5s"
-      retries: 10
-      timeout: "10s"
     log_driver: "json-file"
     log_options:
       max_size: "100m"
@@ -40,11 +35,6 @@
       - "{{ immich_network_name }}"
     restart_policy: "always"
     state: started
-    healthcheck:
-      cmd: "redis-cli -a {{ immich_redis_password }} ping"
-      interval: "5s"
-      retries: 10
-      timeout: "5s"
     log_driver: "json-file"
     log_options:
       max_size: "10m"
@@ -116,8 +106,8 @@
     log_options:
       max_size: "100m"
       path: "{{ immich_json_logs_location }}/immich-server.log"
-
-- name: "Allow Immich Server port through firewall"
+  
+- name: "Allow Immich Server port through firewalld (RHEL family)"
   become: true
   ansible.posix.firewalld:
     port: "{{ immich_proxy_port }}/tcp"
@@ -125,3 +115,13 @@
     state: enabled
   when: ansible_facts['os_family'] == "RedHat"
   notify: Restart firewalld
+
+- name: "Allow Immich Server port through ufw (Debian family)"
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "{{ immich_proxy_port }}"
+    proto: tcp
+    comment: "Allow Immich Proxy"
+  when: ansible_facts['os_family'] == "Debian"
+  notify: Reload ufw
