@@ -11,7 +11,7 @@
       PGDATA: "/var/lib/postgresql/data" # Internal path, ensure volume maps here
       POSTGRES_INITDB_ARGS: '--data-checksums'
     volume:
-      - "pgdata:/var/lib/postgresql:Z" # :Z for SELinux
+      - "pgdata:/var/lib/postgresql/data:Z" # Mount pgdata directly to PGDATA path
     network:
       - "{{ immich_network_name }}"
     restart_policy: "always"
@@ -47,7 +47,6 @@
     name: "immich-machine-learning"
     image: "{{ immich_machine_learning_image_name }}:{{ immich_version }}"
     hostname: "immich-machine-learning"
-    user: "{{ immich_container_uid }}:{{ immich_container_gid }}"
     env:
       DB_HOSTNAME: "{{ immich_db_hostname }}"
       DB_USERNAME: "{{ immich_db_username }}"
@@ -57,9 +56,8 @@
       REDIS_PASSWORD: "{{ immich_redis_password }}"
       LOG_LEVEL: "{{ immich_log_level }}"
       TZ: "{{ immich_timezone }}"
-      MACHINE_LEARNING_CACHE_DIR: "/cache" # Default is /cache, explicitly set for clarity
     volume:
-      - "immich-model-cache:/cache:Z" # Volume for downloaded machine learning models
+      - "immich-machine-learning:/cache"
     network:
       - "{{ immich_network_name }}"
     restart_policy: "always"
@@ -90,8 +88,8 @@
     volume: >-
       {{
         [
-          (external_immich_upload_dst ~ ':/usr/src/app/upload:Z' if external_immich_upload_enabled | bool else 'immich-upload:/usr/src/app/upload:Z'),
-          'immich-generated:/usr/src/app/generated:Z'
+          (external_immich_upload_dst ~ ':/usr/src/app/upload:z' if external_immich_upload_enabled | bool else 'immich-upload:/usr/src/app/upload:z'),
+          'immich-generated:/usr/src/app/generated:z'
         ]
         +
         ([external_lib_dst ~ ':/usr/src/app/external:ro'] if external_lib_enabled | bool and external_lib_dst else [])

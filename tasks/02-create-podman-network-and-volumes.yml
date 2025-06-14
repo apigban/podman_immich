@@ -49,7 +49,7 @@
       - { name: "pgdata" }
       - { name: "redisdata" }
       - { name: "immich-generated" }
-      - { name: "immich-model-cache" } # For ML model caching
+      - { name: "immich-machine-learning" }
       - { name: "immich-upload", condition: "not (external_immich_upload_enabled | bool)" }
 
 - name: "Create Podman volumes"
