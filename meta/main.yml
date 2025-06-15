@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: immich_podman
+  role_name: podman_immich
   author: Alain Pinero Igban
   description: Deploys immich using podman
   company: apigban.com
