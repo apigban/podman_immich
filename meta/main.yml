@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: apigban.immich_podman
+  role_name: immich_podman
   author: Alain Pinero Igban
   description: Deploys immich using podman
   company: apigban.com
@@ -14,6 +14,6 @@ galaxy_info:
         - "9"
     - name: Debian
       versions:
-        - "12" # Bookworm
+        - "bookworm" # Bookworm
 
   galaxy_tags: []
